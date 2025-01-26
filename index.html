@@ -13,7 +13,7 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            background: grey;
+            background: #f0f2f5;
         }
 
         .top-section {
@@ -24,19 +24,53 @@
             flex-shrink: 0;
         }
 
-        .canvas-container {
+        .main-container {
             flex: 1;
-            overflow: auto;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .shapes-toolbar {
+            width: 100px;
+            background: #fff;
+            border-left: 1px solid #ddd;
+            overflow-y: auto;
+            padding: 10px;
+            position: relative;
+        }
+
+        .canvas-wrapper {
+            flex: 1;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
         }
 
         #mainCanvas {
             background: #fff;
             box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            margin: auto;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .shape-item {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            transition: transform 0.2s;
+        }
+
+        .shape-item:hover {
+            transform: scale(1.05);
+            border-color: #2196F3;
         }
 
         .form-row {
@@ -46,37 +80,9 @@
         }
 
         .btn { min-width: 120px; }
-
-        /* شريط الأشكال */
-        .shapes-toolbar {
-            position: fixed;
-            left: 20px;
-            top: 20px;
-            background: white;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            z-index: 1000;
-        }
-
-        .shape {
-            padding: 8px;
-            margin: 5px;
-            cursor: move;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            user-select: none;
-        }
     </style>
 </head>
 <body>
-    <!-- شريط الأشكال -->
-    <div class="shapes-toolbar">
-        <div class="shape" data-type="rect" draggable="true">⬜ مستطيل</div>
-        <div class="shape" data-type="circle" draggable="true">🔵 دائرة</div>
-        <div class="shape" data-type="triangle" draggable="true">🔺 مثلث</div>
-    </div>
-
     <!-- القسم العلوي -->
     <div class="top-section">
         <div class="container-fluid">
@@ -119,9 +125,19 @@
         </div>
     </div>
 
-    <!-- منطقة الكانفاس -->
-    <div class="canvas-container">
-        <canvas id="mainCanvas"></canvas>
+    <!-- المحتوى الرئيسي -->
+    <div class="main-container">
+        <!-- شريط الأشكال -->
+        <div class="shapes-toolbar">
+            <div class="shape-item" data-type="rect" draggable="true">⬜</div>
+            <div class="shape-item" data-type="circle" draggable="true">🔵</div>
+            <div class="shape-item" data-type="triangle" draggable="true">🔺</div>
+        </div>
+
+        <!-- منطقة الكانفاس -->
+        <div class="canvas-wrapper">
+            <canvas id="mainCanvas"></canvas>
+        </div>
     </div>
 
     <!-- نافذة تعديل النص -->
@@ -175,35 +191,32 @@
 
         let originalImage = null;
         let currentText = null;
-        let isCtrlPressed = false;
-        let isDragging = false;
-        let clone = null;
-        let draggedShapeType = null;
 
-        // أحداث سحب الأشكال
-        document.querySelectorAll('.shape').forEach(shape => {
-            shape.addEventListener('dragstart', e => {
-                draggedShapeType = e.target.dataset.type;
+        // إدارة سحب الأشكال
+        document.querySelectorAll('.shape-item').forEach(item => {
+            item.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setData('text/plain', this.dataset.type);
             });
         });
 
-        canvas.on('dragover', e => {
-            e.e.preventDefault();
+        canvas.wrapperEl.addEventListener('dragover', e => e.preventDefault());
+        
+        canvas.wrapperEl.addEventListener('drop', e => {
+            e.preventDefault();
+            const type = e.dataTransfer.getData('text/plain');
+            const rect = canvas.wrapperEl.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            addShape(type, x, y);
         });
 
-        canvas.on('drop', e => {
-            e.e.preventDefault();
-            
-            if (!draggedShapeType) return;
-            
-            const pointer = canvas.getPointer(e.e);
+        function addShape(type, x, y) {
             let shape;
-            
-            switch(draggedShapeType) {
+            switch(type) {
                 case 'rect':
                     shape = new fabric.Rect({
-                        left: pointer.x,
-                        top: pointer.y,
+                        left: x,
+                        top: y,
                         width: 100,
                         height: 60,
                         fill: '#f0f0f0',
@@ -211,22 +224,20 @@
                         strokeWidth: 2
                     });
                     break;
-                    
                 case 'circle':
                     shape = new fabric.Circle({
-                        left: pointer.x,
-                        top: pointer.y,
+                        left: x,
+                        top: y,
                         radius: 40,
                         fill: '#f0f0f0',
                         stroke: '#333',
                         strokeWidth: 2
                     });
                     break;
-                    
                 case 'triangle':
                     shape = new fabric.Triangle({
-                        left: pointer.x,
-                        top: pointer.y,
+                        left: x,
+                        top: y,
                         width: 80,
                         height: 80,
                         fill: '#f0f0f0',
@@ -235,31 +246,22 @@
                     });
                     break;
             }
-            
             if (shape) {
                 canvas.add(shape);
                 canvas.setActiveObject(shape);
                 canvas.requestRenderAll();
             }
-            
-            draggedShapeType = null;
-        });
+        }
 
-        // باقي الدوال (تحميل الصور، إضافة النصوص، etc...)
-        document.getElementById('bgImageUpload').addEventListener('change', function(e) {
-            loadImage(e.target.files[0], true);
-        });
-
-        document.getElementById('elementImageUpload').addEventListener('change', function(e) {
-            loadImage(e.target.files[0], false);
-        });
+        // تحميل الصور
+        document.getElementById('bgImageUpload').addEventListener('change', e => loadImage(e.target.files[0], true));
+        document.getElementById('elementImageUpload').addEventListener('change', e => loadImage(e.target.files[0], false));
 
         function loadImage(file, isBackground) {
             if (!file) return;
-
             const reader = new FileReader();
-            reader.onload = (event) => {
-                fabric.Image.fromURL(event.target.result, (img) => {
+            reader.onload = e => {
+                fabric.Image.fromURL(e.target.result, img => {
                     if (isBackground) {
                         if (originalImage) canvas.remove(originalImage);
                         originalImage = img;
@@ -283,28 +285,26 @@
         }
 
         function updateCanvasSize(img) {
-            const container = document.querySelector('.canvas-container');
+            const container = document.querySelector('.canvas-wrapper');
             const scale = Math.min(
                 (container.clientWidth - 40) / img.width,
                 (container.clientHeight - 40) / img.height
             );
-
             canvas.setDimensions({
                 width: img.width * scale,
                 height: img.height * scale
             });
-
             img.scale(scale);
             canvas.requestRenderAll();
         }
 
+        // إدارة النصوص
         function addText() {
-            const textContent = document.getElementById('fullName').value.trim();
-            if (!textContent) return;
-
-            const text = new fabric.Textbox(textContent.toUpperCase(), {
-                left: canvas.width / 2,
-                top: canvas.height / 2,
+            const text = document.getElementById('fullName').value.trim();
+            if (!text) return;
+            const textbox = new fabric.Textbox(text.toUpperCase(), {
+                left: canvas.width/2,
+                top: canvas.height/2,
                 fontSize: 24,
                 fontFamily: 'Arial',
                 fill: '#000',
@@ -313,43 +313,37 @@
                 originX: 'center',
                 originY: 'center'
             });
-
-            canvas.add(text);
-            canvas.setActiveObject(text);
+            canvas.add(textbox);
+            canvas.setActiveObject(textbox);
             canvas.requestRenderAll();
         }
 
-        document.addEventListener('keydown', (e) => {
-            const activeObject = canvas.getActiveObject();
-            if (!activeObject) return;
-
-            const moveStep = e.shiftKey ? 10 : 5;
-            
+        // التحكم بالعناصر
+        document.addEventListener('keydown', e => {
+            const obj = canvas.getActiveObject();
+            if (!obj) return;
+            const step = e.shiftKey ? 5 : 1;
             switch(e.key) {
-                case 'ArrowUp': activeObject.top -= moveStep; break;
-                case 'ArrowDown': activeObject.top += moveStep; break;
-                case 'ArrowLeft': activeObject.left -= moveStep; break;
-                case 'ArrowRight': activeObject.left += moveStep; break;
-                case 'Delete': canvas.remove(activeObject); break;
+                case 'ArrowUp': obj.top -= step; break;
+                case 'ArrowDown': obj.top += step; break;
+                case 'ArrowLeft': obj.left -= step; break;
+                case 'ArrowRight': obj.left += step; break;
+                case 'Delete': canvas.remove(obj); break;
             }
-            
             canvas.requestRenderAll();
         });
 
-        canvas.on('mouse:dblclick', (e) => {
+        // تعديل النصوص
+        canvas.on('mouse:dblclick', e => {
             if (e.target?.isType('textbox')) {
                 currentText = e.target;
-                openEditModal(currentText);
+                document.getElementById('editText').value = currentText.text;
+                document.getElementById('editFontSize').value = currentText.fontSize;
+                document.getElementById('editColor').value = currentText.fill;
+                document.getElementById('editFont').value = currentText.fontFamily;
+                new bootstrap.Modal(document.getElementById('editModal')).show();
             }
         });
-
-        function openEditModal(textItem) {
-            document.getElementById('editText').value = textItem.text;
-            document.getElementById('editFontSize').value = textItem.fontSize;
-            document.getElementById('editColor').value = textItem.fill;
-            document.getElementById('editFont').value = textItem.fontFamily;
-            new bootstrap.Modal(document.getElementById('editModal')).show();
-        }
 
         function saveTextChanges() {
             currentText.set({
@@ -362,24 +356,20 @@
             bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
         }
 
+        // حفظ الصورة
         function saveImage() {
-            if (!originalImage) {
-                alert('الرجاء تحميل صورة خلفية أولاً');
-                return;
-            }
-
-            const dataURL = canvas.toDataURL({
+            if (!originalImage) return alert('الرجاء تحميل خلفية أولاً');
+            const link = document.createElement('a');
+            link.download = `design-${Date.now()}.png`;
+            link.href = canvas.toDataURL({
                 format: 'png',
                 quality: 1,
                 multiplier: 2
             });
-
-            const link = document.createElement('a');
-            link.download = `صورة-مخصصة-${Date.now()}.png`;
-            link.href = dataURL;
             link.click();
         }
 
+        // تكييف الحجم مع النافذة
         window.addEventListener('resize', () => {
             if (originalImage) updateCanvasSize(originalImage);
         });
