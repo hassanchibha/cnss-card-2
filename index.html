@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر الصور المتقدم</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: grey;
+        }
+
+        .top-section {
+            padding: 15px;
+            background: #fff;
+            border-bottom: 2px solid #dee2e6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .canvas-container {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #mainCanvas {
+            background: #fff;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            margin: auto;
+        }
+
+        .form-row {
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn { min-width: 120px; }
+
+        /* مؤشر النسخ */
+        .copy-cursor {
+            cursor: copy !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- القسم العلوي -->
+    <div class="top-section">
+        <div class="container-fluid">
+            <div class="row form-row">
+                <!-- زر تحميل الخلفية -->
+                <div class="col-auto">
+                    <div class="input-group">
+                        <input type="file" id="bgImageUpload" class="form-control" accept="image/*" hidden>
+                        <button class="btn btn-outline-secondary" onclick="document.getElementById('bgImageUpload').click()">
+                            <i class="fas fa-image"></i> خلفية
+                        </button>
+                    </div>
+                </div>
+
+                <!-- زر إضافة الصور -->
+                <div class="col-auto">
+                    <div class="input-group">
+                        <input type="file" id="elementImageUpload" class="form-control" accept="image/*" hidden>
+                        <button class="btn btn-outline-primary" onclick="document.getElementById('elementImageUpload').click()">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- حقل إدخال النص -->
+                <div class="col-auto">
+                    <input type="text" id="fullName" class="form-control" placeholder="أدخل النص هنا">
+                </div>
+
+                <!-- مجموعة الأزرار -->
+                <div class="col-auto btn-group">
+                    <button onclick="addText()" class="btn btn-primary">
+                        <i class="fas fa-text-height"></i> أضف النص
+                    </button>
+                    <button onclick="saveImage()" class="btn btn-success">
+                        <i class="fas fa-download"></i> حفظ الصورة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- منطقة الكانفاس -->
+    <div class="canvas-container">
+        <canvas id="mainCanvas"></canvas>
+    </div>
+
+    <!-- نافذة تعديل النص -->
+    <div class="modal fade" id="editModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تعديل النص</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label>المحتوى</label>
+                        <input type="text" id="editText" class="form-control">
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label>حجم الخط</label>
+                            <input type="number" id="editFontSize" class="form-control" min="10" max="100">
+                        </div>
+                        <div class="col-6">
+                            <label>لون الخط</label>
+                            <input type="color" id="editColor" class="form-control">
+                        </div>
+                        <div class="col-12">
+                            <label>نوع الخط</label>
+                            <select id="editFont" class="form-select">
+                                <option value="Arial">Arial</option>
+								<option value="Times New Roman">Times New Roman</option>
+								<option value="Verdana">Verdana</option>
+								<option value="Courier New">Courier New</option>
+								<option value="Georgia">Georgia</option>
+								<option value="Comic Sans MS">Comic Sans MS</option>
+								<option value="Impact">Impact</option>
+								<option value="Lucida Console">Lucida Console</option>
+								<option value="Tahoma">Tahoma</option>
+								<option value="Trebuchet MS">Trebuchet MS</option>
+								<option value="Palatino">Palatino</option>
+								<option value="Garamond">Garamond</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" onclick="saveTextChanges()">حفظ التغييرات</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const canvas = new fabric.Canvas('mainCanvas', {
+            selection: true,
+            preserveObjectStacking: true,
+            allowTouchScrolling: true
+        });
+
+        let originalImage = null;
+        let currentText = null;
+        let isCtrlPressed = false;
+        let isDragging = false;
+        let clone = null;
+        let hoveredText = null;
+
+        // تتبع حالة زر Ctrl
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Control') {
+                isCtrlPressed = true;
+                updateCursor();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'Control') {
+                isCtrlPressed = false;
+                updateCursor();
+            }
+        });
+
+        // تحديث المؤشر
+        function updateCursor() {
+            const container = document.querySelector('.canvas-container');
+            if (isCtrlPressed && hoveredText) {
+                container.classList.add('copy-cursor');
+            } else {
+                container.classList.remove('copy-cursor');
+            }
+        }
+
+        // أحداث الماوس على الكانفاس
+        canvas.on('mouse:move', (options) => {
+            hoveredText = options.target?.isType('textbox') ? options.target : null;
+            updateCursor();
+
+            if (isDragging && clone && isCtrlPressed) {
+                const pointer = canvas.getPointer(options.e);
+                clone.set({
+                    left: pointer.x,
+                    top: pointer.y
+                });
+                canvas.requestRenderAll();
+            }
+        });
+
+        canvas.on('mouse:down', (options) => {
+            if (hoveredText && isCtrlPressed) {
+                isDragging = true;
+                clone = new fabric.Textbox(hoveredText.text, {
+                    ...hoveredText.toObject(),
+                    left: hoveredText.left,
+                    top: hoveredText.top,
+                    opacity: 0.7
+                });
+                canvas.add(clone);
+                canvas.setActiveObject(clone);
+            }
+        });
+
+        canvas.on('mouse:up', () => {
+            if (isDragging) {
+                isDragging = false;
+                if (clone) {
+                    clone.set({ opacity: 1 });
+                    clone = null;
+                }
+                updateCursor();
+            }
+        });
+
+        // تحميل الخلفية
+        document.getElementById('bgImageUpload').addEventListener('change', function(e) {
+            loadImage(e.target.files[0], true);
+        });
+
+        // تحميل الصور كعناصر
+        document.getElementById('elementImageUpload').addEventListener('change', function(e) {
+            loadImage(e.target.files[0], false);
+        });
+
+        function loadImage(file, isBackground) {
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                fabric.Image.fromURL(event.target.result, (img) => {
+                    if (isBackground) {
+                        if (originalImage) canvas.remove(originalImage);
+                        originalImage = img;
+                        updateCanvasSize(img);
+                        canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+                    } else {
+                        img.set({
+                            left: canvas.width/2,
+                            top: canvas.height/2,
+                            hasControls: true,
+                            borderColor: '#4CAF50',
+                            originX: 'center',
+                            originY: 'center'
+                        });
+                        canvas.add(img);
+                        canvas.setActiveObject(img);
+                    }
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // تحديث حجم الكانفاس
+        function updateCanvasSize(img) {
+            const container = document.querySelector('.canvas-container');
+            const scale = Math.min(
+                (container.clientWidth - 40) / img.width,
+                (container.clientHeight - 40) / img.height
+            );
+
+            canvas.setDimensions({
+                width: img.width * scale,
+                height: img.height * scale
+            });
+
+            img.scale(scale);
+            canvas.requestRenderAll();
+        }
+
+        // إضافة النص
+        function addText() {
+            const textContent = document.getElementById('fullName').value.trim();
+            if (!textContent) return;
+
+            const text = new fabric.Textbox(textContent.toUpperCase(), {
+                left: canvas.width / 2,
+                top: canvas.height / 2,
+                fontSize: 24,
+                fontFamily: 'Arial',
+                fill: '#000',
+                hasControls: true,
+                borderColor: '#2196F3',
+                originX: 'center',
+                originY: 'center'
+            });
+			
+			document.getElementById('fullName').value = ''و
+            canvas.add(text);
+            canvas.setActiveObject(text);
+            canvas.requestRenderAll();
+        }
+
+        // التحكم بالعناصر باستخدام الكيبورد
+        document.addEventListener('keydown', (e) => {
+            const activeObject = canvas.getActiveObject();
+            if (!activeObject) return;
+
+            const moveStep = e.shiftKey ? 10 : 5;
+            
+            switch(e.key) {
+                case 'ArrowUp': activeObject.top -= moveStep; break;
+                case 'ArrowDown': activeObject.top += moveStep; break;
+                case 'ArrowLeft': activeObject.left -= moveStep; break;
+                case 'ArrowRight': activeObject.left += moveStep; break;
+                case 'Delete': canvas.remove(activeObject); break;
+            }
+            
+            canvas.requestRenderAll();
+        });
+
+        // تعديل النصوص
+        canvas.on('mouse:dblclick', (e) => {
+            if (e.target?.isType('textbox')) {
+                currentText = e.target;
+                openEditModal(currentText);
+            }
+        });
+
+        function openEditModal(textItem) {
+            document.getElementById('editText').value = textItem.text;
+            document.getElementById('editFontSize').value = textItem.fontSize;
+            document.getElementById('editColor').value = textItem.fill;
+            document.getElementById('editFont').value = textItem.fontFamily;
+            new bootstrap.Modal(document.getElementById('editModal')).show();
+        }
+
+        function saveTextChanges() {
+            currentText.set({
+                text: document.getElementById('editText').value.toUpperCase(),
+                fontSize: parseInt(document.getElementById('editFontSize').value),
+                fill: document.getElementById('editColor').value,
+                fontFamily: document.getElementById('editFont').value
+            });
+            canvas.requestRenderAll();
+            bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+        }
+
+        // حفظ الصورة
+        function saveImage() {
+            if (!originalImage) {
+                alert('الرجاء تحميل صورة خلفية أولاً');
+                return;
+            }
+
+            const dataURL = canvas.toDataURL({
+                format: 'png',
+                quality: 1,
+                multiplier: 2
+            });
+
+            const link = document.createElement('a');
+            link.download = `صورة-مخصصة-${Date.now()}.png`;
+            link.href = dataURL;
+            link.click();
+        }
+
+        // تكييف الحجم مع تغيير النافذة
+        window.addEventListener('resize', () => {
+            if (originalImage) updateCanvasSize(originalImage);
+        });
+    </script>
+</body>
+</html>
