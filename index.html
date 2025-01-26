@@ -13,7 +13,7 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            background: grey;
+            background: #f0f2f5;
         }
 
         .top-section {
@@ -47,13 +47,36 @@
 
         .btn { min-width: 120px; }
 
-        /* مؤشر النسخ */
-        .copy-cursor {
-            cursor: copy !important;
+        /* شريط الأشكال */
+        .shapes-toolbar {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            background: white;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+
+        .shape {
+            padding: 8px;
+            margin: 5px;
+            cursor: move;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            user-select: none;
         }
     </style>
 </head>
 <body>
+    <!-- شريط الأشكال -->
+    <div class="shapes-toolbar">
+        <div class="shape" data-type="rect" draggable="true">⬜ مستطيل</div>
+        <div class="shape" data-type="circle" draggable="true">🔵 دائرة</div>
+        <div class="shape" data-type="triangle" draggable="true">🔺 مثلث</div>
+    </div>
+
     <!-- القسم العلوي -->
     <div class="top-section">
         <div class="container-fluid">
@@ -63,7 +86,7 @@
                     <div class="input-group">
                         <input type="file" id="bgImageUpload" class="form-control" accept="image/*" hidden>
                         <button class="btn btn-outline-secondary" onclick="document.getElementById('bgImageUpload').click()">
-                            <i class="fas fa-image"></i>
+                            <i class="fas fa-image"></i> خلفية
                         </button>
                     </div>
                 </div>
@@ -73,7 +96,7 @@
                     <div class="input-group">
                         <input type="file" id="elementImageUpload" class="form-control" accept="image/*" hidden>
                         <button class="btn btn-outline-primary" onclick="document.getElementById('elementImageUpload').click()">
-                            <i class="fas fa-plus"></i>
+                            <i class="fas fa-plus"></i> صورة
                         </button>
                     </div>
                 </div>
@@ -86,10 +109,10 @@
                 <!-- مجموعة الأزرار -->
                 <div class="col-auto btn-group">
                     <button onclick="addText()" class="btn btn-primary">
-                        <i class="fas fa-text-height"></i> أضف النص
+                        <i class="fas fa-text-height"></i> نص
                     </button>
                     <button onclick="saveImage()" class="btn btn-success">
-                        <i class="fas fa-download"></i> حفظ الصورة
+                        <i class="fas fa-download"></i> حفظ
                     </button>
                 </div>
             </div>
@@ -127,17 +150,9 @@
                             <label>نوع الخط</label>
                             <select id="editFont" class="form-select">
                                 <option value="Arial">Arial</option>
-								<option value="Times New Roman">Times New Roman</option>
-								<option value="Verdana">Verdana</option>
-								<option value="Courier New">Courier New</option>
-								<option value="Georgia">Georgia</option>
-								<option value="Comic Sans MS">Comic Sans MS</option>
-								<option value="Impact">Impact</option>
-								<option value="Lucida Console">Lucida Console</option>
-								<option value="Tahoma">Tahoma</option>
-								<option value="Trebuchet MS">Trebuchet MS</option>
-								<option value="Palatino">Palatino</option>
-								<option value="Garamond">Garamond</option>
+                                <option value="Times New Roman">Times New Roman</option>
+                                <option value="Tahoma">Tahoma</option>
+                                <option value="Simplified Arabic">Simplified Arabic</option>
                             </select>
                         </div>
                     </div>
@@ -163,79 +178,78 @@
         let isCtrlPressed = false;
         let isDragging = false;
         let clone = null;
-        let hoveredText = null;
+        let draggedShapeType = null;
 
-        // تتبع حالة زر Ctrl
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Control') {
-                isCtrlPressed = true;
-                updateCursor();
-            }
+        // أحداث سحب الأشكال
+        document.querySelectorAll('.shape').forEach(shape => {
+            shape.addEventListener('dragstart', e => {
+                draggedShapeType = e.target.dataset.type;
+            });
         });
 
-        document.addEventListener('keyup', (e) => {
-            if (e.key === 'Control') {
-                isCtrlPressed = false;
-                updateCursor();
-            }
+        canvas.on('dragover', e => {
+            e.e.preventDefault();
         });
 
-        // تحديث المؤشر
-        function updateCursor() {
-            const container = document.querySelector('.canvas-container');
-            if (isCtrlPressed && hoveredText) {
-                container.classList.add('copy-cursor');
-            } else {
-                container.classList.remove('copy-cursor');
+        canvas.on('drop', e => {
+            e.e.preventDefault();
+            
+            if (!draggedShapeType) return;
+            
+            const pointer = canvas.getPointer(e.e);
+            let shape;
+            
+            switch(draggedShapeType) {
+                case 'rect':
+                    shape = new fabric.Rect({
+                        left: pointer.x,
+                        top: pointer.y,
+                        width: 100,
+                        height: 60,
+                        fill: '#f0f0f0',
+                        stroke: '#333',
+                        strokeWidth: 2
+                    });
+                    break;
+                    
+                case 'circle':
+                    shape = new fabric.Circle({
+                        left: pointer.x,
+                        top: pointer.y,
+                        radius: 40,
+                        fill: '#f0f0f0',
+                        stroke: '#333',
+                        strokeWidth: 2
+                    });
+                    break;
+                    
+                case 'triangle':
+                    shape = new fabric.Triangle({
+                        left: pointer.x,
+                        top: pointer.y,
+                        width: 80,
+                        height: 80,
+                        fill: '#f0f0f0',
+                        stroke: '#333',
+                        strokeWidth: 2
+                    });
+                    break;
             }
-        }
-
-        // أحداث الماوس على الكانفاس
-        canvas.on('mouse:move', (options) => {
-            hoveredText = options.target?.isType('textbox') ? options.target : null;
-            updateCursor();
-
-            if (isDragging && clone && isCtrlPressed) {
-                const pointer = canvas.getPointer(options.e);
-                clone.set({
-                    left: pointer.x,
-                    top: pointer.y
-                });
+            
+            if (shape) {
+                canvas.add(shape);
+                canvas.setActiveObject(shape);
                 canvas.requestRenderAll();
             }
+            
+            draggedShapeType = null;
         });
 
-        canvas.on('mouse:down', (options) => {
-            if (hoveredText && isCtrlPressed) {
-                isDragging = true;
-                clone = new fabric.Textbox(hoveredText.text, {
-                    ...hoveredText.toObject(),
-                    left: hoveredText.left,
-                    top: hoveredText.top,
-                    opacity: 0.7
-                });
-                canvas.add(clone);
-                canvas.setActiveObject(clone);
-            }
-        });
-
-        canvas.on('mouse:up', () => {
-            if (isDragging) {
-                isDragging = false;
-                if (clone) {
-                    clone.set({ opacity: 1 });
-                    clone = null;
-                }
-                updateCursor();
-            }
-        });
-
-        // تحميل الخلفية
+        // باقي الدوال (تحميل الصور، إضافة النصوص، etc...)
         document.getElementById('bgImageUpload').addEventListener('change', function(e) {
             loadImage(e.target.files[0], true);
         });
 
-        // تحميل الصور كعناصر
         document.getElementById('elementImageUpload').addEventListener('change', function(e) {
             loadImage(e.target.files[0], false);
         });
@@ -268,7 +282,6 @@
             reader.readAsDataURL(file);
         }
 
-        // تحديث حجم الكانفاس
         function updateCanvasSize(img) {
             const container = document.querySelector('.canvas-container');
             const scale = Math.min(
@@ -285,7 +298,6 @@
             canvas.requestRenderAll();
         }
 
-        // إضافة النص
         function addText() {
             const textContent = document.getElementById('fullName').value.trim();
             if (!textContent) return;
@@ -301,19 +313,17 @@
                 originX: 'center',
                 originY: 'center'
             });
-			
-	    document.getElementById('fullName').value = '';
+
             canvas.add(text);
             canvas.setActiveObject(text);
             canvas.requestRenderAll();
         }
 
-        // التحكم بالعناصر باستخدام الكيبورد
         document.addEventListener('keydown', (e) => {
             const activeObject = canvas.getActiveObject();
             if (!activeObject) return;
 
-            const moveStep = e.shiftKey ? 5 : 1;
+            const moveStep = e.shiftKey ? 10 : 5;
             
             switch(e.key) {
                 case 'ArrowUp': activeObject.top -= moveStep; break;
@@ -326,7 +336,6 @@
             canvas.requestRenderAll();
         });
 
-        // تعديل النصوص
         canvas.on('mouse:dblclick', (e) => {
             if (e.target?.isType('textbox')) {
                 currentText = e.target;
@@ -353,7 +362,6 @@
             bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
         }
 
-        // حفظ الصورة
         function saveImage() {
             if (!originalImage) {
                 alert('الرجاء تحميل صورة خلفية أولاً');
@@ -372,7 +380,6 @@
             link.click();
         }
 
-        // تكييف الحجم مع تغيير النافذة
         window.addEventListener('resize', () => {
             if (originalImage) updateCanvasSize(originalImage);
         });
