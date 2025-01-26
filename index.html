@@ -313,7 +313,7 @@
             const activeObject = canvas.getActiveObject();
             if (!activeObject) return;
 
-            const moveStep = e.shiftKey ? 10 : 5;
+            const moveStep = e.shiftKey ? 5 : 1;
             
             switch(e.key) {
                 case 'ArrowUp': activeObject.top -= moveStep; break;
