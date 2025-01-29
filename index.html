@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر الصور المتقدم</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Aclonica&family=Abril+Fatface&family=Agbalumo&family=Aguafina+Script&family=Akronim&family=Aldrich&family=Alex+Brush&family=Alfa+Slab+One&family=Alumni+Sans+Collegiate+One&family=Amita&family=Angkor&family=Anta&family=Anonymous+Pro&family=Arbutus&family=Architects+Daughter&family=Arizonia&family=Asset&family=Audiowide&family=Badeen+Display&family=Bevan&family=BioRhyme+Expanded&family=Bowlby+One+SC&family=Bruno+Ace+SC&family=Bungee&family=Bungee+Shade&family=Caesar+Dressing&family=Chango&family=Climate+Crisis&family=Codystar&family=Faster+One&family=Honk&family=Material+Symbols+Rounded&family=Monofett&family=Syncopate&family=Sixtyfour&family=Silkscreen&family=Oi&display=swap" rel="stylesheet">    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Top Section -->
+    <div class="top-section">
+        <div class="container-fluid">
+            <div class="row form-row">
+                <div class="col-auto">
+                    <div class="input-group">
+                        <input type="file" id="bgImageUpload" class="form-control" accept="image/*" hidden>
+                        <button class="btn btn-outline-secondary" id="backgroundButton">
+                            <i class="fas fa-image"></i> خلفية
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-auto">
+                    <div class="input-group">
+                        <input type="file" id="elementImageUpload" class="form-control" accept="image/*" hidden>
+                        <button class="btn btn-outline-primary"  id="elementButton">
+                            <i class="fas fa-plus"></i> صورة
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-auto">
+                    <input type="text" id="fullName" class="form-control" placeholder="أدخل النص هنا">
+                </div>
+
+                <div class="col-auto btn-group">
+					<button onclick="addText()" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> أضف النص
+                    </button>
+                    <button onclick="saveImage()" class="btn btn-success">
+                        <i class="fas fa-download"></i> حفظ الصورة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="properties-panel">
+            <div class="panel-content">
+			<div class="property-group">
+					<button id="deleteElement" class="btn btn-danger w-100">
+						<i class="fas fa-trash"></i> حذف
+					</button>
+				</div>
+				<div class="property-group">
+					<div class="d-flex gap-2">
+						<button id="bringForward" class="flex-grow-1">
+							<i class="fas fa-arrow-up"></i>
+						</button>
+						<button id="sendBackward" class="flex-grow-1">
+							<i class="fas fa-arrow-down"></i>
+						</button>
+					</div>
+				</div>
+                <div class="property-group">
+                    <label>النص</label>
+                    <input type="text" id="textContent" class="form-control">
+                </div>
+                <div class="property-group">
+                    <label>حجم الخط</label>
+                    <input type="number" id="fontSize" class="form-control" min="8" max="100">
+                </div>
+                <div class="property-group">
+                    <label>نوع الخط</label>
+                    <select id="fontFamily" class="form-select">
+                        <!-- Arabic Fonts -->
+						<option value="Amiri">Amiri</option>
+						<option value="Cairo">Cairo</option>
+						<option value="Tajawal">Tajawal</option>
+						<option value="Lalezar">Lalezar</option>
+						<option value="Reem Kufi">Reem Kufi</option>
+						<option value="Harmattan">Harmattan</option>
+						
+						<!-- Display Fonts -->
+						<option value="Aclonica">Aclonica</option>
+						<option value="Abril Fatface">Abril Fatface</option>
+						<option value="Agbalumo">Agbalumo</option>
+						<option value="Alfa Slab One">Alfa Slab One</option>
+						<option value="Alumni Sans Collegiate One">Alumni Sans Collegiate One</option>
+						<option value="Anta">Anta</option>
+						<option value="Audiowide">Audiowide</option>
+						<option value="Bevan">Bevan</option>
+						<option value="BioRhyme Expanded">BioRhyme Expanded</option>
+						<option value="Bowlby One SC">Bowlby One SC</option>
+						<option value="Bruno Ace SC">Bruno Ace SC</option>
+						<option value="Bungee">Bungee</option>
+						<option value="Bungee Shade">Bungee Shade</option>
+						
+						<!-- Script and Handwriting Fonts -->
+						<option value="Aguafina Script">Aguafina Script</option>
+						<option value="Alex Brush">Alex Brush</option>
+						<option value="Architects Daughter">Architects Daughter</option>
+						<option value="Arizonia">Arizonia</option>
+						
+						<!-- Decorative Fonts -->
+						<option value="Akronim">Akronim</option>
+						<option value="Angkor">Angkor</option>
+						<option value="Arbutus">Arbutus</option>
+						<option value="Asset">Asset</option>
+						<option value="Caesar Dressing">Caesar Dressing</option>
+						<option value="Chango">Chango</option>
+						<option value="Climate Crisis">Climate Crisis</option>
+						<option value="Codystar">Codystar</option>
+						<option value="Faster One">Faster One</option>
+						<option value="Honk">Honk</option>
+						<option value="Monofett">Monofett</option>
+						<option value="Oi">Oi</option>
+						
+						<!-- Monospace and Technical Fonts -->
+						<option value="Anonymous Pro">Anonymous Pro</option>
+						<option value="Silkscreen">Silkscreen</option>
+						<option value="Sixtyfour">Sixtyfour</option>
+						<option value="Syncopate">Syncopate</option>
+						
+						<!-- Standard Fonts -->
+						<option value="Arial">Arial</option>
+						<option value="Times New Roman">Times New Roman</option>
+						<option value="Georgia">Georgia</option>
+						<option value="Verdana">Verdana</option>
+                    </select>
+                </div>
+                <div class="property-group">
+                    <label>وزن الخط</label>
+                    <select id="fontWeight" class="form-select">
+                        <option value="100">خفيف جدا</option>
+						<option value="300">خفيف</option>
+						<option value="400">عادي</option>
+						<option value="500">متوسط</option>
+						<option value="700">ثخين</option>
+						<option value="900">ثخين جدا</option>
+                    </select>
+                </div>
+				<div class="property-group">
+					<label>لون الخط</label>
+					<input type="color" id="textColor" class="form-control">
+				</div>
+				<div class="property-group">
+					<label>اتجاه النص</label>
+					<select id="textAlign" class="form-select">
+						<option value="right">يمبن</option>
+						<option value="left">يسار</option>
+						<option value="center">في الوسط</option>
+					</select>
+				</div>
+            </div>
+        </div>
+        <div class="canvas-wrapper">
+            <canvas id="mainCanvas"></canvas>
+        </div>
+    </div>
+
+<!-- Modal Background Selection -->
+<div id="bgSelectionModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5>اختر خلفية</h5>
+            <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="upload-section">
+                <label for="bgImageUploadModal" class="upload-btn">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>تحميل صورة من جهازك</span>
+                </label>
+                <input type="file" id="bgImageUploadModal" accept="image/*" hidden>
+            </div>
+            <div class="presets-section">
+                <div class="presets-container">
+                    <div class="preset-image" data-src="https://i.postimg.cc/BbM8gwm6/cnss-card.png">
+                        <img src="https://i.postimg.cc/BbM8gwm6/cnss-card.png" alt="خلفية">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/3Jh0CGNc/M1.png">
+                        <img src="https://i.postimg.cc/3Jh0CGNc/M1.png" alt="خلفية">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/T16108dD/M2.png">
+                        <img src="https://i.postimg.cc/T16108dD/M2.png" alt="خلفية">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/6qf31Hq1/M3.png">
+                        <img src="https://i.postimg.cc/6qf31Hq1/M3.png" alt="خلفية">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/3xJyzHgj/M4.png">
+                        <img src="https://i.postimg.cc/3xJyzHgj/M4.png" alt="خلفية">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/Z579SDcG/M5.png">
+                        <img src="https://i.postimg.cc/Z579SDcG/M5.png" alt="خلفية">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/SNG2ZKzN/M6.png">
+                        <img src="https://i.postimg.cc/SNG2ZKzN/M6.png" alt="خلفية">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/CKRRLHrz/M7.png">
+                        <img src="https://i.postimg.cc/CKRRLHrz/M7.png" alt="خلفية">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/W1GXKtHh/t1.png">
+                        <img src="https://i.postimg.cc/W1GXKtHh/t1.png" alt="خلفية">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/6pJMYCzk/t2.png">
+                        <img src="https://i.postimg.cc/6pJMYCzk/t2.png" alt="خلفية">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Element Selection -->
+<div id="elementSelectionModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5>اختر صورة</h5>
+            <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="upload-section">
+                <label for="elementImageUploadModal" class="upload-btn">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>تحميل صورة من جهازك</span>
+                </label>
+                <input type="file" id="elementImageUploadModal" accept="image/*" hidden>
+            </div>
+            <div class="presets-section">
+                <div class="presets-container">
+                    <div class="preset-image" data-src="https://i.postimg.cc/VNTjGQGF/AMO.png">
+                        <img src="https://i.postimg.cc/VNTjGQGF/AMO.png" alt="صورة">
+                    </div>
+                    <div class="preset-image" data-src="https://github.com/hassanchibha/cnss-card/raw/main/c1.svg">
+                        <img src="https://github.com/hassanchibha/cnss-card/raw/main/c1.svg" alt="صورة">
+                    </div>
+                    <div class="preset-image" data-src="https://github.com/hassanchibha/cnss-card/raw/main/w1.svg">
+                        <img src="https://github.com/hassanchibha/cnss-card/raw/main/w1.svg" alt="صورة">
+                    </div>
+                    <div class="preset-image" data-src="https://github.com/hassanchibha/cnss-card/raw/main/b1.svg">
+                        <img src="https://github.com/hassanchibha/cnss-card/raw/main/b1.svg" alt="صورة">
+                    </div>
+                    <div class="preset-image" data-src="https://github.com/hassanchibha/cnss-card/raw/main/bl1.svg">
+                        <img src="https://github.com/hassanchibha/cnss-card/raw/main/bl1.svg" alt="صورة">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/pTwJTbKd/bar6.png">
+                        <img src="https://i.postimg.cc/pTwJTbKd/bar6.png" alt="صورة">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/gJZ31S1b/cnss1.png">
+                        <img src="https://i.postimg.cc/gJZ31S1b/cnss1.png" alt="صورة">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/cCGfW7Ng/cnss2.png">
+                        <img src="https://i.postimg.cc/cCGfW7Ng/cnss2.png" alt="صورة">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/qqcyvtkm/cnss3.png">
+                        <img src="https://i.postimg.cc/qqcyvtkm/cnss3.png" alt="صورة">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/QNcpbzpp/cnss4.png">
+                        <img src="https://i.postimg.cc/QNcpbzpp/cnss4.png" alt="صورة">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/wjqc3kRD/maroc.png">
+                        <img src="https://i.postimg.cc/wjqc3kRD/maroc.png" alt="صورة">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/tg73NC5T/maroc2.png">
+                        <img src="https://i.postimg.cc/tg73NC5T/maroc2.png" alt="صورة">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/g2gyh63Q/maroc3.png">
+                        <img src="https://i.postimg.cc/g2gyh63Q/maroc3.png" alt="صورة">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/DydP2N02/photo1.png">
+                        <img src="https://i.postimg.cc/DydP2N02/photo1.png" alt="صورة">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/QCckK4qJ/taxe1.png">
+                        <img src="https://i.postimg.cc/QCckK4qJ/taxe1.png" alt="صورة">
+                    </div>
+                    <div class="preset-image" data-src="https://i.postimg.cc/MZBYLH8f/taxe2.png">
+                        <img src="https://i.postimg.cc/MZBYLH8f/taxe2.png" alt="صورة">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: grey;
+	user-select: none;
+}
+
+.top-section {
+    padding: 15px;
+    background: #fff;
+    border-bottom: 2px solid #dee2e6;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+}
+
+.main-container {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.properties-panel {
+    width: 200px;
+    background: white;
+    border-right: 1px solid #dee2e6;
+    padding: 10px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    overflow-y: auto;
+}
+
+.panel-content {
+    display: none;
+}
+
+.property-group {
+    margin-bottom: 10px;
+}
+
+.property-group label {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 12px;
+}
+
+.property-group input,
+.property-group select {
+    width: 100%;
+    padding: 3px;
+    font-size: 12px;
+}
+
+.canvas-wrapper {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#mainCanvas {
+    background: #fff;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.form-row {
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn { 
+    min-width: 120px;
+	border-radius: 50px;
+}
+
+/* تحسين تصميم الأزرار */
+#deleteElement {
+    margin-bottom: 10px;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.gap-2 {
+    gap: 10px;
+}
+
+.flex-grow-1 {
+    flex-grow: 1;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 900px;
+    max-height: 80vh;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.upload-section {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.upload-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background-color: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    padding: 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-btn:hover {
+    background-color: #e9ecef;
+}
+
+.upload-btn i {
+    font-size: 24px;
+    color: #6c757d;
+}
+
+.presets-section {
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+.presets-container {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 20px;
+}
+
+.preset-image {
+    flex: 0 0 auto;
+    width: 200px;
+    height: 150px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    border: 1px solid blue; /* إضافة حدود شفافة */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* إضافة ظل خفيف */
+}
+
+/* عند تحويم المؤشر فوق الصورة */
+.preset-image:hover {
+    transform: translateY(-2px);
+    border-color: #4CAF50; /* لون أخضر للحدود */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2); /* زيادة الظل */
+}
+
+/* عند اختيار الصورة */
+.preset-image.selected {
+    border-color: #2196F3; /* لون أزرق للحدود */
+    box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.2); /* هالة زرقاء خفيفة */
+}
+
+.preset-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Scrollbar Styling */
+.presets-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.presets-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.presets-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.presets-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.text-thin {font-weight: 100; /* Thin */}
+.text-light {font-weight: 300; /* Light */}
+.text-regular {font-weight: 400; /* Normal */}
+.text-medium {font-weight: 500; /* Medium */}
+.text-bold {font-weight: 700; /* Bold */}
+.text-black {font-weight: 900; /* Black */}
+
+#fontFamily option[value="Amiri"] { font-family: 'Amiri'; }
+#fontFamily option[value="Cairo"] { font-family: 'Cairo'; }
+#fontFamily option[value="Tajawal"] { font-family: 'Tajawal'; }
+#fontFamily option[value="Lalezar"] { font-family: 'Lalezar'; }
+#fontFamily option[value="Reem Kufi"] { font-family: 'Reem Kufi'; }
+#fontFamily option[value="Harmattan"] { font-family: 'Harmattan'; }
+#fontFamily option[value="Aclonica"] { font-family: 'Aclonica'; }
+#fontFamily option[value="Abril Fatface"] { font-family: 'Abril Fatface'; }
+#fontFamily option[value="Agbalumo"] { font-family: 'Agbalumo'; }
+#fontFamily option[value="Alfa Slab One"] { font-family: 'Alfa Slab One'; }
+#fontFamily option[value="Alumni Sans Collegiate One"] { font-family: 'Alumni Sans Collegiate One'; }
+#fontFamily option[value="Anta"] { font-family: 'Anta'; }
+#fontFamily option[value="Audiowide"] { font-family: 'Audiowide'; }
+#fontFamily option[value="Bevan"] { font-family: 'Bevan'; }
+#fontFamily option[value="BioRhyme Expanded"] { font-family: 'BioRhyme Expanded'; }
+#fontFamily option[value="Bowlby One SC"] { font-family: 'Bowlby One SC'; }
+#fontFamily option[value="Bruno Ace SC"] { font-family: 'Bruno Ace SC'; }
+#fontFamily option[value="Bungee"] { font-family: 'Bungee'; }
+#fontFamily option[value="Bungee Shade"] { font-family: 'Bungee Shade'; }
+#fontFamily option[value="Aguafina Script"] { font-family: 'Aguafina Script'; }
+#fontFamily option[value="Alex Brush"] { font-family: 'Alex Brush'; }
+#fontFamily option[value="Architects Daughter"] { font-family: 'Architects Daughter'; }
+#fontFamily option[value="Arizonia"] { font-family: 'Arizonia'; }
+#fontFamily option[value="Akronim"] { font-family: 'Akronim'; }
+#fontFamily option[value="Angkor"] { font-family: 'Angkor'; }
+#fontFamily option[value="Arbutus"] { font-family: 'Arbutus'; }
+#fontFamily option[value="Asset"] { font-family: 'Asset'; }
+#fontFamily option[value="Caesar Dressing"] { font-family: 'Caesar Dressing'; }
+#fontFamily option[value="Chango"] { font-family: 'Chango'; }
+#fontFamily option[value="Climate Crisis"] { font-family: 'Climate Crisis'; }
+#fontFamily option[value="Codystar"] { font-family: 'Codystar'; }
+#fontFamily option[value="Faster One"] { font-family: 'Faster One'; }
+#fontFamily option[value="Honk"] { font-family: 'Honk'; }
+#fontFamily option[value="Monofett"] { font-family: 'Monofett'; }
+#fontFamily option[value="Oi"] { font-family: 'Oi'; }
+#fontFamily option[value="Anonymous Pro"] { font-family: 'Anonymous Pro'; }
+#fontFamily option[value="Silkscreen"] { font-family: 'Silkscreen'; }
+#fontFamily option[value="Sixtyfour"] { font-family: 'Sixtyfour'; }
+#fontFamily option[value="Syncopate"] { font-family: 'Syncopate'; }
+#fontFamily option[value="Arial"] { font-family: 'Arial'; }
+#fontFamily option[value="Times New Roman"] { font-family: 'Times New Roman'; }
+#fontFamily option[value="Georgia"] { font-family: 'Georgia'; }
+#fontFamily option[value="Verdana"] { font-family: 'Verdana'; }
+
+#fontFamily {
+    direction: rtl; /* يجعل النص والسهم على اليمين */
+    padding-left: 30px; /* يضيف مساحة للسهم على اليسار */
+    appearance: none; /* يخفي السهم الافتراضي */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="18px" height="18px"><path d="M7 10l5 5 5-5z"/></svg>'); /* سهم مخصص */
+    background-repeat: no-repeat;
+    background-position: left; /* تحديد موقع السهم على اليسار */
+}
+
+#fontWeight {
+    direction: rtl; /* يجعل النص والسهم على اليمين */
+    padding-left: 30px; /* يضيف مساحة للسهم على اليسار */
+    appearance: none; /* يخفي السهم الافتراضي */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="18px" height="18px"><path d="M7 10l5 5 5-5z"/></svg>'); /* سهم مخصص */
+    background-repeat: no-repeat;
+    background-position: left; /* تحديد موقع السهم على اليسار */
+}
+
+#textAlign {
+    direction: rtl; /* يجعل النص والسهم على اليمين */
+    padding-left: 30px; /* يضيف مساحة للسهم على اليسار */
+    appearance: none; /* يخفي السهم الافتراضي */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="18px" height="18px"><path d="M7 10l5 5 5-5z"/></svg>'); /* سهم مخصص */
+    background-repeat: no-repeat;
+    background-position: left; /* تحديد موقع السهم على اليسار */
+} 
+
+/* تحديد حجم الصور في نافذة اختيار العنصر */
+#elementSelectionModal .preset-image {
+    width: 80px;  /* عرض الصورة سيكون 80px */
+    height: 80px; /* ارتفاع الصورة سيكون 80px */
+    object-fit: cover; /* الحفاظ على نسب الصورة */
+    margin: 5px; /* إضافة هامش بين الصور */
+}
+
+#elementSelectionModal .preset-image:hover {
+    transform: scale(1.1); /* تكبير الصورة بنسبة 10% */
+    transition: transform 0.3s ease; /* تأثير الانتقال */
+}
