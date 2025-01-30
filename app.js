@@ -333,7 +333,6 @@ function saveImage() {
     link.download = 'صورة_مخصصة.png';
     link.click();
 }
-}
 
 // Resize Handler
 let resizeTimeout;
