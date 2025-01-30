@@ -17,6 +17,7 @@ let originalScale = 1; // لتخزين نسبة التحجيم الأصلية
 document.getElementById('bgImageUpload').addEventListener('change', e => loadBackgroundImage(e.target.files[0]));
 document.getElementById('elementImageUpload').addEventListener('change', e => loadElementImage(e.target.files[0]));
 
+const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
 // دالة تحميل صورة الخلفية
 function loadBackgroundImage(file) {
     if (!file) return;
@@ -31,7 +32,7 @@ function loadBackgroundImage(file) {
             updateCanvasSize(fabricImage);
             canvas.setBackgroundImage(fabricImage, canvas.renderAll.bind(canvas));
         };
-        img.src = e.target.result;
+        img.src = proxyUrl + e.target.result;
     };
     reader.readAsDataURL(file);
 }
@@ -61,7 +62,7 @@ function loadElementImage(file) {
             canvas.setActiveObject(fabricImage);
             canvas.requestRenderAll();
         };
-        img.src = e.target.result;
+        img.src = proxyUrl + e.target.result;
     };
     reader.readAsDataURL(file);
 }
