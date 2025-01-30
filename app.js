@@ -315,7 +315,7 @@ function saveImage() {
         multiplier: 2
     });
     link.click();*/
-    html2canvas(document.querySelector('#mainCanvas').getBoundingClientRect(), {
+    html2canvas(document.querySelector('#mainCanvas'), {
         allowTaint: false,
         useCORS: true,
         backgroundColor: null
