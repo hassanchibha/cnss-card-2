@@ -22,12 +22,16 @@ function loadBackgroundImage(file) {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = e => {
-        fabric.Image.fromURL(e.target.result, img => {
+        const img = new Image();
+        img.crossOrigin = "anonymous"; // تمكين CORS
+        img.onload = () => {
+            const fabricImage = new fabric.Image(img);
             if (originalImage) canvas.remove(originalImage);
-            originalImage = img;
-            updateCanvasSize(img);
-            canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
-        });
+            originalImage = fabricImage;
+            updateCanvasSize(fabricImage);
+            canvas.setBackgroundImage(fabricImage, canvas.renderAll.bind(canvas));
+        };
+        img.src = e.target.result;
     };
     reader.readAsDataURL(file);
 }
@@ -37,14 +41,15 @@ function loadElementImage(file) {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = e => {
-        fabric.Image.fromURL(e.target.result, img => {
-            // تعيين حجم معقول للصورة المضافة
+        const img = new Image();
+        img.crossOrigin = "anonymous"; // تمكين CORS
+        img.onload = () => {
+            const fabricImage = new fabric.Image(img);
             const maxSize = 200;
-            const scale = Math.min(maxSize/img.width, maxSize/img.height);
+            const scale = Math.min(maxSize/fabricImage.width, maxSize/fabricImage.height);
             
-            img.scale(scale);
-            
-            img.set({
+            fabricImage.scale(scale);
+            fabricImage.set({
                 left: canvas.width/2,
                 top: canvas.height/2,
                 hasControls: true,
@@ -52,10 +57,11 @@ function loadElementImage(file) {
                 originX: 'center',
                 originY: 'center'
             });
-            canvas.add(img);
-            canvas.setActiveObject(img);
+            canvas.add(fabricImage);
+            canvas.setActiveObject(fabricImage);
             canvas.requestRenderAll();
-        });
+        };
+        img.src = e.target.result;
     };
     reader.readAsDataURL(file);
 }
@@ -303,7 +309,7 @@ function saveImage() {
     link.download = `design-${Date.now()}.png`;
     link.href = canvas.toDataURL({
         format: 'png',
-        quality: 1,
+        quality: 1.0,
         multiplier: 2
     });
     link.click();
@@ -359,14 +365,18 @@ presetBackgrounds.forEach(preset => {
         selectedPreset = preset;
 
         const imageUrl = preset.dataset.src;
-        fabric.Image.fromURL(imageUrl, img => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+            const fabricImage = new fabric.Image(img);
             if (originalImage) canvas.remove(originalImage);
-            originalImage = img;
-            updateCanvasSize(img);
-            canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+            originalImage = fabricImage;
+            updateCanvasSize(fabricImage);
+            canvas.setBackgroundImage(fabricImage, canvas.renderAll.bind(canvas));
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
-        });
+        };
+        img.src = imageUrl;
     });
 });
 
@@ -377,10 +387,9 @@ document.querySelectorAll('#elementSelectionModal .preset-image').forEach(preset
 
 function addElementImage(event) {
     const imageUrl = event.target.dataset.src;
-
-    // التحقق واش الصورة SVG ولا PNG/JPG
+    
+    // معالجة ملفات SVG
     if (imageUrl && imageUrl.endsWith('.svg')) {
-        // تحميل SVG
         fabric.loadSVGFromURL(imageUrl, function(objects, options) {
             const svg = fabric.util.groupSVGElements(objects, options);
             
@@ -398,16 +407,18 @@ function addElementImage(event) {
             elementModal.style.display = 'none';
             document.body.style.overflow = 'auto';
             canvas.requestRenderAll();
-        });
+        }, function() {}, { crossOrigin: 'anonymous' }); // إضافة خيار CORS لتحميل SVG
     } else {
-        // تحميل PNG/JPG
-        fabric.Image.fromURL(imageUrl, img => {
+        // معالجة أنواع الصور الأخرى
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+            const fabricImage = new fabric.Image(img);
             const maxSize = 200;
-            const scale = Math.min(maxSize / img.width, maxSize / img.height);
+            const scale = Math.min(maxSize / fabricImage.width, maxSize / fabricImage.height);
 
-            img.scale(scale);
-
-            img.set({
+            fabricImage.scale(scale);
+            fabricImage.set({
                 left: canvas.width / 2,
                 top: canvas.height / 2,
                 hasControls: true,
@@ -416,13 +427,14 @@ function addElementImage(event) {
                 originY: 'center'
             });
 
-            canvas.add(img);
-            canvas.setActiveObject(img);
+            canvas.add(fabricImage);
+            canvas.setActiveObject(fabricImage);
             elementModal.style.display = 'none';
             document.body.style.overflow = 'auto';
             canvas.requestRenderAll();
-        });
-	}
+        };
+        img.src = imageUrl;
+    }
 }
 
 // معالجة تحميل الصور من الجهاز
