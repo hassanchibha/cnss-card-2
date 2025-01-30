@@ -306,16 +306,14 @@ document.addEventListener('keydown', e => {
 // Save Image
 function saveImage() {
     if (!originalImage) return alert('الرجاء تحميل خلفية أولاً');
-    html2canvas(document.querySelector('#mainCanvas'), {
-        allowTaint: true,
-        useCORS: true,
-        foreignObjectRendering: true
-    }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `design-${Date.now()}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();}
-    )
+    const link = document.createElement('a');
+    link.download = `design-${Date.now()}.png`;
+    link.href = canvas.toDataURL({
+        format: 'png',
+        quality: 1.0,
+        multiplier: 2
+    });
+    link.click();
 }
 
 // Resize Handler
