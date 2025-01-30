@@ -24,7 +24,7 @@ function loadBackgroundImage(file) {
     const reader = new FileReader();
     reader.onload = e => {
         const img = new Image();
-        img.crossOrigin = "anonymous"; // تمكين CORS
+        img.crossOrigin = "Anonymous"; // تمكين CORS
         img.onload = () => {
             const fabricImage = new fabric.Image(img);
             if (originalImage) canvas.remove(originalImage);
@@ -43,7 +43,7 @@ function loadElementImage(file) {
     const reader = new FileReader();
     reader.onload = e => {
         const img = new Image();
-        img.crossOrigin = "anonymous"; // تمكين CORS
+        img.crossOrigin = "Anonymous"; // تمكين CORS
         img.onload = () => {
             const fabricImage = new fabric.Image(img);
             const maxSize = 200;
@@ -307,9 +307,9 @@ document.addEventListener('keydown', e => {
 function saveImage() {
     if (!originalImage) return alert('الرجاء تحميل خلفية أولاً');
     html2canvas(document.querySelector('#mainCanvas'), {
-        allowTaint: false,
+        allowTaint: true,
         useCORS: true,
-        backgroundColor: null
+        foreignObjectRendering: true
     }).then(canvas => {
         const link = document.createElement('a');
         link.download = `design-${Date.now()}.png`;
@@ -369,7 +369,7 @@ presetBackgrounds.forEach(preset => {
 
         const imageUrl = preset.dataset.src;
         const img = new Image();
-        img.crossOrigin = "anonymous";
+        img.crossOrigin = "Anonymous";
         img.onload = () => {
             const fabricImage = new fabric.Image(img);
             if (originalImage) canvas.remove(originalImage);
@@ -410,11 +410,11 @@ function addElementImage(event) {
             elementModal.style.display = 'none';
             document.body.style.overflow = 'auto';
             canvas.requestRenderAll();
-        }, function() {}, { crossOrigin: 'anonymous' }); // إضافة خيار CORS لتحميل SVG
+        }, function() {}, { crossOrigin: 'Anonymous' }); // إضافة خيار CORS لتحميل SVG
     } else {
         // معالجة أنواع الصور الأخرى
         const img = new Image();
-        img.crossOrigin = "anonymous";
+        img.crossOrigin = "Anonymous";
         img.onload = () => {
             const fabricImage = new fabric.Image(img);
             const maxSize = 200;
