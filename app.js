@@ -315,6 +315,7 @@ function saveImage() {
         link.download = `design-${Date.now()}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
+    }
 }
 
 // Resize Handler
