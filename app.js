@@ -306,14 +306,25 @@ document.addEventListener('keydown', e => {
 // Save Image
 function saveImage() {
     if (!originalImage) return alert('الرجاء تحميل خلفية أولاً');
-	const link = document.createElement('a');
+    /*
+    const link = document.createElement('a');
     link.download = `design-${Date.now()}.png`;
     link.href = canvas.toDataURL({
         format: 'png',
         quality: 1.0,
         multiplier: 2
     });
-    link.click();
+    link.click();*/
+    html2canvas(document.querySelector('#mainCanvas').getBoundingClientRect(), {
+        allowTaint: false,
+        useCORS: true,
+        backgroundColor: null
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `design-${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
 }
 
 // Resize Handler
