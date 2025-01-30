@@ -306,7 +306,7 @@ document.addEventListener('keydown', e => {
 // Save Image
 function saveImage() {
     if (!originalImage) return alert('الرجاء تحميل خلفية أولاً');
-	const canvas = document.getElementById(mainCanvas');
+	const canvas = document.getElementById('mainCanvas');
     const dataURL = canvas.toDataURL('image/png');
     const link = document.createElement('a');
     link.href = dataURL;
