@@ -315,6 +315,7 @@ function saveImage() {
         multiplier: 2
     });
     link.click();*/
+	/*
     html2canvas(document.querySelector('#mainCanvas'), {
         allowTaint: false,
         useCORS: true,
@@ -324,7 +325,14 @@ function saveImage() {
         link.download = `design-${Date.now()}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
-    });
+    });*/
+	const canvas = document.getElementById(mainCanvas');
+    const dataURL = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.href = dataURL;
+    link.download = 'صورة_مخصصة.png';
+    link.click();
+}
 }
 
 // Resize Handler
