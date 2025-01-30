@@ -314,8 +314,8 @@ function saveImage() {
         const link = document.createElement('a');
         link.download = `design-${Date.now()}.png`;
         link.href = canvas.toDataURL('image/png');
-        link.click();
-    }
+        link.click();}
+    )
 }
 
 // Resize Handler
